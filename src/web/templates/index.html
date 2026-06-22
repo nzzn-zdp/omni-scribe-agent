@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniScribeAgent - 自动化内容生产与分发</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">OmniScribeAgent</a>
+            <ul class="nav-links">
+                <li><a href="/hotspots">热点监控</a></li>
+                <li><a href="/content">内容生产</a></li>
+                <li><a href="/publish">发布管理</a></li>
+                <li><a href="/settings">系统设置</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="dashboard">
+            <h1>系统概览</h1>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>热点源</h3>
+                    <p id="hotspot-sources-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>内容任务</h3>
+                    <p id="content-tasks-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>已发布</h3>
+                    <p id="published-count">0</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
