@@ -41,23 +41,27 @@ check_docker() {
         sudo systemctl start docker
         sudo systemctl enable docker
         sudo usermod -aG docker $USER
-        # 配置Docker镜像加速
-        sudo mkdir -p /etc/docker
-        sudo tee /etc/docker/daemon.json <<-'EOF'
-{
-  "registry-mirrors": [
-    "https://mirror.ccs.tencentyun.com",
-    "https://registry.docker-cn.com",
-    "https://docker.mirrors.ustc.edu.cn"
-  ]
-}
-EOF
-        sudo systemctl daemon-reload
-        sudo systemctl restart docker
         print_info "Docker安装完成"
     else
         print_info "Docker已安装"
     fi
+    
+    # 配置Docker镜像加速（必须配置，否则无法拉取镜像）
+    print_info "配置Docker镜像加速..."
+    sudo mkdir -p /etc/docker
+    sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://docker.1ms.run",
+    "https://docker.xuanyuan.me",
+    "https://docker.m.daocloud.io",
+    "https://mirror.ccs.tencentyun.com"
+  ]
+}
+EOF
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+    print_info "Docker镜像加速配置完成"
 }
 
 # 检查Docker Compose是否安装
