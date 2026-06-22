@@ -16,6 +16,9 @@ REPO_URL="git@github.com:nzzn-zdp/omni-scribe-agent.git"
 PROJECT_DIR=$(pwd)
 CONTAINER_NAME="omni-scribe-agent"
 
+# Docker Compose命令
+DOCKER_COMPOSE=""
+
 # 打印带颜色的消息
 print_info() {
     echo -e "${GREEN}[INFO]${NC} $1"
@@ -59,15 +62,33 @@ EOF
 
 # 检查Docker Compose是否安装
 check_docker_compose() {
-    if ! command -v docker-compose &> /dev/null; then
-        print_warn "Docker Compose未安装，开始安装..."
-        # 使用国内镜像快速安装
-        sudo curl -L "https://mirror.ghproxy.com/https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        sudo chmod +x /usr/local/bin/docker-compose
-        print_info "Docker Compose安装完成"
-    else
-        print_info "Docker Compose已安装"
+    # 优先使用docker compose (新版)
+    if docker compose version &> /dev/null; then
+        DOCKER_COMPOSE="docker compose"
+        print_info "Docker Compose已安装 (插件模式)"
+        return
     fi
+    
+    # 检查docker-compose命令
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE="docker-compose"
+        print_info "Docker Compose已安装"
+        return
+    fi
+    
+    print_warn "Docker Compose未安装，开始安装..."
+    
+    # 创建目录
+    sudo mkdir -p /usr/local/bin
+    
+    # 使用国内镜像快速安装
+    sudo curl -L "https://mirror.ghproxy.com/https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    
+    # 设置权限
+    sudo chmod +x /usr/local/bin/docker-compose
+    
+    DOCKER_COMPOSE="docker-compose"
+    print_info "Docker Compose安装完成"
 }
 
 # 拉取代码
@@ -120,7 +141,7 @@ EOF
 # 停止旧容器
 stop_old_container() {
     print_info "停止旧容器..."
-    docker-compose down 2>/dev/null || true
+    $DOCKER_COMPOSE down 2>/dev/null || true
     docker stop $CONTAINER_NAME 2>/dev/null || true
     docker rm $CONTAINER_NAME 2>/dev/null || true
     print_info "旧容器已停止"
@@ -129,20 +150,20 @@ stop_old_container() {
 # 构建并启动服务
 build_and_start() {
     print_info "构建Docker镜像..."
-    docker-compose build --no-cache
+    $DOCKER_COMPOSE build --no-cache
     
     print_info "启动服务..."
-    docker-compose up -d
+    $DOCKER_COMPOSE up -d
     
     print_info "等待服务启动..."
     sleep 5
     
     # 检查服务状态
-    if docker-compose ps | grep -q "Up"; then
+    if $DOCKER_COMPOSE ps | grep -q "Up"; then
         print_info "服务启动成功!"
     else
         print_error "服务启动失败，请查看日志:"
-        docker-compose logs
+        $DOCKER_COMPOSE logs
         exit 1
     fi
 }
@@ -165,10 +186,10 @@ show_info() {
     echo "管理界面: http://$(hostname -I | awk '{print $1}'):8000/settings"
     echo ""
     echo "常用命令:"
-    echo "  查看日志: docker-compose logs -f"
-    echo "  重启服务: docker-compose restart"
-    echo "  停止服务: docker-compose down"
-    echo "  查看状态: docker-compose ps"
+    echo "  查看日志: $DOCKER_COMPOSE logs -f"
+    echo "  重启服务: $DOCKER_COMPOSE restart"
+    echo "  停止服务: $DOCKER_COMPOSE down"
+    echo "  查看状态: $DOCKER_COMPOSE ps"
     echo ""
     echo "首次使用请访问系统设置页面初始化配置"
     echo "========================================="
