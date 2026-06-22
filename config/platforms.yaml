@@ -1,0 +1,20 @@
+wechat:
+  app_id: ${WECHAT_APP_ID}
+  app_secret: ${WECHAT_APP_SECRET}
+  thumb_media_id: ""
+
+weibo:
+  access_token: ${WEIBO_ACCESS_TOKEN}
+
+zhihu:
+  client_id: ${ZHIHU_CLIENT_ID}
+  client_secret: ${ZHIHU_CLIENT_SECRET}
+
+xiaohongshu:
+  # 小红书配置
+  cookie: ""
+
+wordpress:
+  url: ""
+  username: ""
+  password: ""
