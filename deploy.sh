@@ -33,10 +33,24 @@ print_error() {
 check_docker() {
     if ! command -v docker &> /dev/null; then
         print_warn "Docker未安装，开始安装..."
-        curl -fsSL https://get.docker.com | sh
+        # 使用阿里云镜像安装
+        curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
         sudo systemctl start docker
         sudo systemctl enable docker
         sudo usermod -aG docker $USER
+        # 配置Docker镜像加速
+        sudo mkdir -p /etc/docker
+        sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": [
+    "https://mirror.ccs.tencentyun.com",
+    "https://registry.docker-cn.com",
+    "https://docker.mirrors.ustc.edu.cn"
+  ]
+}
+EOF
+        sudo systemctl daemon-reload
+        sudo systemctl restart docker
         print_info "Docker安装完成"
     else
         print_info "Docker已安装"
@@ -47,7 +61,8 @@ check_docker() {
 check_docker_compose() {
     if ! command -v docker-compose &> /dev/null; then
         print_warn "Docker Compose未安装，开始安装..."
-        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        # 使用国内镜像快速安装
+        sudo curl -L "https://mirror.ghproxy.com/https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
         print_info "Docker Compose安装完成"
     else
