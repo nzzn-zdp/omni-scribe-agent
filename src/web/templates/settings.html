@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置 - OmniScribeAgent</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">OmniScribeAgent</a>
+            <ul class="nav-links">
+                <li><a href="/hotspots">热点监控</a></li>
+                <li><a href="/content">内容生产</a></li>
+                <li><a href="/publish">发布管理</a></li>
+                <li><a href="/settings">系统设置</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="settings-page">
+            <h1>系统设置</h1>
+            
+            <div class="settings-actions">
+                <button id="init-configs-btn" class="btn btn-primary">初始化默认配置</button>
+            </div>
+            
+            <div class="settings-tabs">
+                <button class="tab-btn active" data-category="llm">LLM配置</button>
+                <button class="tab-btn" data-category="platform">平台配置</button>
+                <button class="tab-btn" data-category="system">系统配置</button>
+            </div>
+            
+            <div class="settings-content">
+                <div id="configs-list" class="configs-grid">
+                    <!-- 配置项将通过JavaScript动态加载 -->
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/js/settings.js"></script>
+</body>
+</html>

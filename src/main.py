@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from .config import settings
+from .config import settings, load_configs_from_db
 from .database import init_db
 from .api import hotspot, content, publish, admin
 
@@ -8,6 +8,8 @@ from .api import hotspot, content, publish, admin
 async def lifespan(app: FastAPI):
     # 启动时初始化数据库
     await init_db()
+    # 从数据库加载配置
+    await load_configs_from_db()
     yield
     # 关闭时清理资源
     pass
