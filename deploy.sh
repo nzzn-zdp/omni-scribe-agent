@@ -96,7 +96,9 @@ pull_code() {
     print_info "拉取最新代码..."
     
     if [ -d ".git" ]; then
-        # 已有git仓库，拉取更新
+        # 已有git仓库，丢弃本地修改并拉取更新
+        git checkout -- . 2>/dev/null || true
+        git clean -fd 2>/dev/null || true
         git pull origin master
     else
         # 克隆仓库
