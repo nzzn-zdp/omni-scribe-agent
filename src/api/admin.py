@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import Dict, Any, List
 from ..database import get_db
 from ..models.hotspot import HotspotSource
@@ -121,19 +122,22 @@ PLATFORM_INFO = {
 async def get_dashboard_data(db: AsyncSession = Depends(get_db)):
     """获取仪表盘数据"""
     # 获取热点源数量
-    hotspot_sources_count = await db.query(HotspotSource).count()
+    result = await db.execute(select(HotspotSource))
+    hotspot_sources_count = len(result.scalars().all())
     
     # 获取内容任务统计
-    content_tasks_count = await db.query(ContentTask).count()
-    completed_tasks_count = await db.query(ContentTask).filter(
-        ContentTask.status == "completed"
-    ).count()
+    result = await db.execute(select(ContentTask))
+    content_tasks_count = len(result.scalars().all())
+    
+    result = await db.execute(select(ContentTask).filter(ContentTask.status == "completed"))
+    completed_tasks_count = len(result.scalars().all())
     
     # 获取发布记录统计
-    publish_records_count = await db.query(PublishRecord).count()
-    published_count = await db.query(PublishRecord).filter(
-        PublishRecord.status == "published"
-    ).count()
+    result = await db.execute(select(PublishRecord))
+    publish_records_count = len(result.scalars().all())
+    
+    result = await db.execute(select(PublishRecord).filter(PublishRecord.status == "published"))
+    published_count = len(result.scalars().all())
     
     return {
         "hotspot_sources": hotspot_sources_count,
@@ -179,12 +183,13 @@ async def get_system_logs(log_type: str = "system", limit: int = 100):
 @router.get("/configs", response_model=List[Dict[str, Any]])
 async def get_all_configs(category: str = None, platform: str = None, db: AsyncSession = Depends(get_db)):
     """获取所有配置"""
-    query = db.query(SystemConfig)
+    query = select(SystemConfig)
     if category:
         query = query.filter(SystemConfig.category == category)
     if platform:
         query = query.filter(SystemConfig.platform == platform)
-    configs = await query.all()
+    result = await db.execute(query)
+    configs = result.scalars().all()
     
     return [
         {
@@ -203,7 +208,8 @@ async def get_all_configs(category: str = None, platform: str = None, db: AsyncS
 @router.get("/configs/{key}")
 async def get_config(key: str, db: AsyncSession = Depends(get_db)):
     """获取单个配置"""
-    config = await db.query(SystemConfig).filter(SystemConfig.key == key).first()
+    result = await db.execute(select(SystemConfig).filter(SystemConfig.key == key))
+    config = result.scalar_one_or_none()
     if not config:
         raise HTTPException(status_code=404, detail="配置不存在")
     
@@ -221,7 +227,8 @@ async def get_config(key: str, db: AsyncSession = Depends(get_db)):
 @router.put("/configs/{key}")
 async def update_config(key: str, config_data: Dict[str, Any], db: AsyncSession = Depends(get_db)):
     """更新配置"""
-    config = await db.query(SystemConfig).filter(SystemConfig.key == key).first()
+    result = await db.execute(select(SystemConfig).filter(SystemConfig.key == key))
+    config = result.scalar_one_or_none()
     if not config:
         raise HTTPException(status_code=404, detail="配置不存在")
     
@@ -237,7 +244,8 @@ async def update_config(key: str, config_data: Dict[str, Any], db: AsyncSession 
 async def init_default_configs(db: AsyncSession = Depends(get_db)):
     """初始化默认配置"""
     for config_data in DEFAULT_CONFIGS:
-        existing = await db.query(SystemConfig).filter(SystemConfig.key == config_data["key"]).first()
+        result = await db.execute(select(SystemConfig).filter(SystemConfig.key == config_data["key"]))
+        existing = result.scalar_one_or_none()
         if not existing:
             config = SystemConfig(**config_data)
             db.add(config)

@@ -1,6 +1,7 @@
 import json
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from typing import List, Dict, Any
 from ..database import get_db
 from ..models.hotspot import HotspotSource, Hotspot
@@ -11,7 +12,8 @@ router = APIRouter()
 @router.get("/", response_model=List[Dict[str, Any]])
 async def get_hotspots(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     """获取热点列表"""
-    hotspots = await db.query(Hotspot).offset(skip).limit(limit).all()
+    result = await db.execute(select(Hotspot).offset(skip).limit(limit))
+    hotspots = result.scalars().all()
     return [
         {
             "id": h.id,
@@ -28,7 +30,8 @@ async def get_hotspots(skip: int = 0, limit: int = 100, db: AsyncSession = Depen
 @router.get("/{hotspot_id}", response_model=Dict[str, Any])
 async def get_hotspot(hotspot_id: int, db: AsyncSession = Depends(get_db)):
     """获取单个热点"""
-    hotspot = await db.query(Hotspot).filter(Hotspot.id == hotspot_id).first()
+    result = await db.execute(select(Hotspot).filter(Hotspot.id == hotspot_id))
+    hotspot = result.scalar_one_or_none()
     if not hotspot:
         raise HTTPException(status_code=404, detail="热点不存在")
     
@@ -65,7 +68,8 @@ async def create_hotspot_source(source_data: Dict[str, Any], db: AsyncSession = 
 @router.post("/evaluate/{hotspot_id}")
 async def evaluate_hotspot(hotspot_id: int, db: AsyncSession = Depends(get_db)):
     """评估热点质量"""
-    hotspot = await db.query(Hotspot).filter(Hotspot.id == hotspot_id).first()
+    result = await db.execute(select(Hotspot).filter(Hotspot.id == hotspot_id))
+    hotspot = result.scalar_one_or_none()
     if not hotspot:
         raise HTTPException(status_code=404, detail="热点不存在")
     
@@ -80,7 +84,8 @@ async def evaluate_hotspot(hotspot_id: int, db: AsyncSession = Depends(get_db)):
 @router.get("/sources/", response_model=List[Dict[str, Any]])
 async def get_hotspot_sources(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     """获取热点源列表"""
-    sources = await db.query(HotspotSource).offset(skip).limit(limit).all()
+    result = await db.execute(select(HotspotSource).offset(skip).limit(limit))
+    sources = result.scalars().all()
     return [
         {
             "id": s.id,
@@ -95,7 +100,8 @@ async def get_hotspot_sources(skip: int = 0, limit: int = 100, db: AsyncSession 
 @router.get("/sources/{source_id}", response_model=Dict[str, Any])
 async def get_hotspot_source(source_id: int, db: AsyncSession = Depends(get_db)):
     """获取单个热点源"""
-    source = await db.query(HotspotSource).filter(HotspotSource.id == source_id).first()
+    result = await db.execute(select(HotspotSource).filter(HotspotSource.id == source_id))
+    source = result.scalar_one_or_none()
     if not source:
         raise HTTPException(status_code=404, detail="热点源不存在")
     
@@ -111,7 +117,8 @@ async def get_hotspot_source(source_id: int, db: AsyncSession = Depends(get_db))
 @router.put("/sources/{source_id}", response_model=Dict[str, Any])
 async def update_hotspot_source(source_id: int, source_data: Dict[str, Any], db: AsyncSession = Depends(get_db)):
     """更新热点源"""
-    source = await db.query(HotspotSource).filter(HotspotSource.id == source_id).first()
+    result = await db.execute(select(HotspotSource).filter(HotspotSource.id == source_id))
+    source = result.scalar_one_or_none()
     if not source:
         raise HTTPException(status_code=404, detail="热点源不存在")
     
@@ -133,7 +140,8 @@ async def update_hotspot_source(source_id: int, source_data: Dict[str, Any], db:
 @router.delete("/sources/{source_id}")
 async def delete_hotspot_source(source_id: int, db: AsyncSession = Depends(get_db)):
     """删除热点源"""
-    source = await db.query(HotspotSource).filter(HotspotSource.id == source_id).first()
+    result = await db.execute(select(HotspotSource).filter(HotspotSource.id == source_id))
+    source = result.scalar_one_or_none()
     if not source:
         raise HTTPException(status_code=404, detail="热点源不存在")
     

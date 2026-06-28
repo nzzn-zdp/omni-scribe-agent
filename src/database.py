@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import text, inspect
 from typing import AsyncGenerator
 from .config import settings
 
@@ -22,17 +23,24 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     async with engine.begin() as conn:
+        # 创建所有表
         await conn.run_sync(Base.metadata.create_all)
         
-        # 检查并添加新字段
-        try:
-            # 获取现有列信息
-            result = await conn.execute("PRAGMA table_info(system_configs)")
-            columns = [row[1] for row in result.fetchall()]
-            
-            if 'help' not in columns:
-                await conn.execute("ALTER TABLE system_configs ADD COLUMN help TEXT")
-            if 'platform' not in columns:
-                await conn.execute("ALTER TABLE system_configs ADD COLUMN platform VARCHAR(100)")
-        except Exception as e:
-            print(f"更新表结构时出错: {e}")
+        # 检查并添加新字段（仅对SQLite）
+        if "sqlite" in settings.database_url:
+            try:
+                # 使用run_sync执行PRAGMA
+                def check_and_add_columns(sync_conn):
+                    # 检查现有列
+                    result = sync_conn.execute(text("PRAGMA table_info(system_configs)"))
+                    columns = [row[1] for row in result.fetchall()]
+                    
+                    if 'help' not in columns:
+                        sync_conn.execute(text("ALTER TABLE system_configs ADD COLUMN help TEXT"))
+                    if 'platform' not in columns:
+                        sync_conn.execute(text("ALTER TABLE system_configs ADD COLUMN platform VARCHAR(100)"))
+                
+                await conn.run_sync(check_and_add_columns)
+                print("数据库表结构更新完成")
+            except Exception as e:
+                print(f"更新表结构时出错: {e}")
