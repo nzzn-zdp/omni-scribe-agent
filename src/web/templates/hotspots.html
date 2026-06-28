@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>热点监控 - OmniScribeAgent</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">OmniScribeAgent</a>
+            <ul class="nav-links">
+                <li><a href="/hotspots">热点监控</a></li>
+                <li><a href="/content">内容生产</a></li>
+                <li><a href="/publish">发布管理</a></li>
+                <li><a href="/settings">系统设置</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="hotspots-page">
+            <h1>热点监控</h1>
+            
+            <div class="hotspots-actions">
+                <button id="add-source-btn" class="btn btn-primary">添加热点源</button>
+                <button id="refresh-hotspots-btn" class="btn btn-secondary">刷新热点</button>
+            </div>
+            
+            <div class="hotspots-content">
+                <div class="hotspot-sources-section">
+                    <h2>热点源</h2>
+                    <div id="hotspot-sources-list" class="sources-grid">
+                        <!-- 热点源将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+                
+                <div class="hotspots-list-section">
+                    <h2>热点列表</h2>
+                    <div id="hotspots-list" class="hotspots-grid">
+                        <!-- 热点列表将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加热点源模态框 -->
+            <div id="add-source-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>添加热点源</h2>
+                    <form id="add-source-form">
+                        <div class="form-group">
+                            <label for="source-name">名称</label>
+                            <input type="text" id="source-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="source-type">类型</label>
+                            <select id="source-type" name="source_type">
+                                <option value="rss">RSS订阅</option>
+                                <option value="api">API接口</option>
+                                <option value="scraper">网页抓取</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="source-config">配置 (JSON)</label>
+                            <textarea id="source-config" name="config" rows="4">{"url": ""}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">添加</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 编辑热点源模态框 -->
+            <div id="edit-source-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>编辑热点源</h2>
+                    <form id="edit-source-form">
+                        <input type="hidden" id="edit-source-id" name="id">
+                        <div class="form-group">
+                            <label for="edit-source-name">名称</label>
+                            <input type="text" id="edit-source-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-source-type">类型</label>
+                            <select id="edit-source-type" name="source_type">
+                                <option value="rss">RSS订阅</option>
+                                <option value="api">API接口</option>
+                                <option value="scraper">网页抓取</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-source-config">配置 (JSON)</label>
+                            <textarea id="edit-source-config" name="config" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-source-active">状态</label>
+                            <select id="edit-source-active" name="is_active">
+                                <option value="true">活跃</option>
+                                <option value="false">停用</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/js/hotspots.js"></script>
+</body>
+</html>

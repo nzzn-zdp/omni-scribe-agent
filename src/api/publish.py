@@ -72,3 +72,53 @@ async def publish_content(draft_id: int, platforms: List[str], db: AsyncSession 
     })
     
     return {"message": "发布请求已提交"}
+
+@router.get("/platforms/{platform_id}", response_model=Dict[str, Any])
+async def get_platform(platform_id: int, db: AsyncSession = Depends(get_db)):
+    """获取单个平台配置"""
+    platform = await db.query(Platform).filter(Platform.id == platform_id).first()
+    if not platform:
+        raise HTTPException(status_code=404, detail="平台不存在")
+    
+    return {
+        "id": platform.id,
+        "name": platform.name,
+        "platform_type": platform.platform_type,
+        "config": platform.config,
+        "is_active": platform.is_active,
+        "created_at": platform.created_at
+    }
+
+@router.put("/platforms/{platform_id}", response_model=Dict[str, Any])
+async def update_platform(platform_id: int, platform_data: Dict[str, Any], db: AsyncSession = Depends(get_db)):
+    """更新平台配置"""
+    platform = await db.query(Platform).filter(Platform.id == platform_id).first()
+    if not platform:
+        raise HTTPException(status_code=404, detail="平台不存在")
+    
+    platform.name = platform_data.get("name", platform.name)
+    platform.platform_type = platform_data.get("platform_type", platform.platform_type)
+    platform.config = json.dumps(platform_data.get("config", {}))
+    platform.is_active = platform_data.get("is_active", platform.is_active)
+    
+    await db.commit()
+    await db.refresh(platform)
+    
+    return {
+        "id": platform.id,
+        "name": platform.name,
+        "platform_type": platform.platform_type,
+        "is_active": platform.is_active
+    }
+
+@router.delete("/platforms/{platform_id}")
+async def delete_platform(platform_id: int, db: AsyncSession = Depends(get_db)):
+    """删除平台配置"""
+    platform = await db.query(Platform).filter(Platform.id == platform_id).first()
+    if not platform:
+        raise HTTPException(status_code=404, detail="平台不存在")
+    
+    await db.delete(platform)
+    await db.commit()
+    
+    return {"message": "平台配置已删除"}

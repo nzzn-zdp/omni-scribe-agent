@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>内容生产 - OmniScribeAgent</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">OmniScribeAgent</a>
+            <ul class="nav-links">
+                <li><a href="/hotspots">热点监控</a></li>
+                <li><a href="/content">内容生产</a></li>
+                <li><a href="/publish">发布管理</a></li>
+                <li><a href="/settings">系统设置</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="content-page">
+            <h1>内容生产</h1>
+            
+            <div class="content-actions">
+                <button id="generate-content-btn" class="btn btn-primary">生成新内容</button>
+                <button id="refresh-content-btn" class="btn btn-secondary">刷新列表</button>
+            </div>
+            
+            <div class="content-tabs">
+                <button class="tab-btn active" data-tab="tasks">内容任务</button>
+                <button class="tab-btn" data-tab="drafts">内容草稿</button>
+            </div>
+            
+            <div class="content-lists">
+                <div id="tasks-list" class="content-list active">
+                    <!-- 内容任务将通过JavaScript动态加载 -->
+                </div>
+                <div id="drafts-list" class="content-list">
+                    <!-- 内容草稿将通过JavaScript动态加载 -->
+                </div>
+            </div>
+            
+            <!-- 生成内容模态框 -->
+            <div id="generate-content-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>生成内容</h2>
+                    <form id="generate-content-form">
+                        <div class="form-group">
+                            <label for="hotspot-id">热点ID</label>
+                            <input type="number" id="hotspot-id" name="hotspot_id" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">生成</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 查看任务详情模态框 -->
+            <div id="task-details-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>任务详情</h2>
+                    <div id="task-details-content">
+                        <!-- 任务详情将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 编辑草稿模态框 -->
+            <div id="edit-draft-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>编辑草稿</h2>
+                    <form id="edit-draft-form">
+                        <input type="hidden" id="edit-draft-id" name="id">
+                        <div class="form-group">
+                            <label for="edit-draft-title">标题</label>
+                            <input type="text" id="edit-draft-title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-draft-content">内容</label>
+                            <textarea id="edit-draft-content" name="content" rows="10" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-draft-summary">摘要</label>
+                            <textarea id="edit-draft-summary" name="summary" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 发布草稿模态框 -->
+            <div id="publish-draft-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>发布草稿</h2>
+                    <form id="publish-draft-form">
+                        <input type="hidden" id="publish-draft-id" name="draft_id">
+                        <div class="form-group">
+                            <label>选择平台</label>
+                            <div id="publish-platforms-checkboxes" class="checkboxes-grid">
+                                <!-- 平台复选框将通过JavaScript动态加载 -->
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">发布</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 查看草稿详情模态框 -->
+            <div id="draft-details-modal" class="modal">
+                <div class="modal-content">
+                    <span class="modal-close">&times;</span>
+                    <h2>草稿详情</h2>
+                    <div id="draft-details-content">
+                        <!-- 草稿详情将通过JavaScript动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <script src="/static/js/content.js"></script>
+</body>
+</html>

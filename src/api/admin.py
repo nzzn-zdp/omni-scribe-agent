@@ -13,24 +13,109 @@ router = APIRouter()
 
 # 默认配置项
 DEFAULT_CONFIGS = [
-    {"key": "openai_api_key", "value": "", "description": "OpenAI API密钥", "category": "llm", "is_sensitive": True},
-    {"key": "openai_model", "value": "gpt-4", "description": "OpenAI模型", "category": "llm", "is_sensitive": False},
-    {"key": "claude_api_key", "value": "", "description": "Claude API密钥", "category": "llm", "is_sensitive": True},
-    {"key": "claude_model", "value": "claude-3-opus-20240229", "description": "Claude模型", "category": "llm", "is_sensitive": False},
-    {"key": "wechat_app_id", "value": "", "description": "微信公众号AppID", "category": "platform", "is_sensitive": False},
-    {"key": "wechat_app_secret", "value": "", "description": "微信公众号AppSecret", "category": "platform", "is_sensitive": True},
-    {"key": "weibo_access_token", "value": "", "description": "微博访问令牌", "category": "platform", "is_sensitive": True},
-    {"key": "zhihu_client_id", "value": "", "description": "知乎客户端ID", "category": "platform", "is_sensitive": False},
-    {"key": "zhihu_client_secret", "value": "", "description": "知乎客户端密钥", "category": "platform", "is_sensitive": True},
-    {"key": "xiaohongshu_cookie", "value": "", "description": "小红书Cookie", "category": "platform", "is_sensitive": True},
-    {"key": "wordpress_url", "value": "", "description": "WordPress站点地址", "category": "platform", "is_sensitive": False},
-    {"key": "wordpress_username", "value": "", "description": "WordPress用户名", "category": "platform", "is_sensitive": False},
-    {"key": "wordpress_password", "value": "", "description": "WordPress密码", "category": "platform", "is_sensitive": True},
-    {"key": "hotspot_check_interval", "value": "300", "description": "热点检查间隔（秒）", "category": "system", "is_sensitive": False},
-    {"key": "hotspot_min_score", "value": "0.6", "description": "热点最低分数", "category": "system", "is_sensitive": False},
-    {"key": "publish_retry_count", "value": "3", "description": "发布重试次数", "category": "system", "is_sensitive": False},
-    {"key": "publish_retry_delay", "value": "60", "description": "发布重试延迟（秒）", "category": "system", "is_sensitive": False},
+    # LLM配置
+    {"key": "openai_api_key", "value": "", "description": "OpenAI API密钥", "help": "在 https://platform.openai.com/api-keys 获取", "category": "llm", "platform": "", "is_sensitive": True},
+    {"key": "openai_model", "value": "gpt-4", "description": "OpenAI模型", "help": "可选: gpt-4, gpt-4-turbo, gpt-3.5-turbo", "category": "llm", "platform": "", "is_sensitive": False},
+    {"key": "claude_api_key", "value": "", "description": "Claude API密钥", "help": "在 https://console.anthropic.com 获取", "category": "llm", "platform": "", "is_sensitive": True},
+    {"key": "claude_model", "value": "claude-3-opus-20240229", "description": "Claude模型", "help": "可选: claude-3-opus, claude-3-sonnet, claude-3-haiku", "category": "llm", "platform": "", "is_sensitive": False},
+    
+    # 微信公众号配置
+    {"key": "wechat_app_id", "value": "", "description": "AppID", "help": "在微信公众平台 https://mp.weixin.qq.com 设置与开发 > 基本配置中获取", "category": "platform", "platform": "wechat", "is_sensitive": False},
+    {"key": "wechat_app_secret", "value": "", "description": "AppSecret", "help": "在微信公众平台设置与开发 > 基本配置中获取，需要管理员扫码确认", "category": "platform", "platform": "wechat", "is_sensitive": True},
+    
+    # 微博配置
+    {"key": "weibo_access_token", "value": "", "description": "Access Token", "help": "在微博开放平台 https://open.weibo.com 创建应用后获取", "category": "platform", "platform": "weibo", "is_sensitive": True},
+    
+    # 知乎配置
+    {"key": "zhihu_client_id", "value": "", "description": "Client ID", "help": "在知乎开放平台 https://open.zhihu.com 创建应用后获取", "category": "platform", "platform": "zhihu", "is_sensitive": False},
+    {"key": "zhihu_client_secret", "value": "", "description": "Client Secret", "help": "在知乎开放平台创建应用后获取", "category": "platform", "platform": "zhihu", "is_sensitive": True},
+    
+    # 小红书配置
+    {"key": "xiaohongshu_cookie", "value": "", "description": "Cookie", "help": "登录小红书网页版 https://www.xiaohongshu.com 后，从浏览器开发者工具中获取Cookie", "category": "platform", "platform": "xiaohongshu", "is_sensitive": True},
+    
+    # WordPress配置
+    {"key": "wordpress_url", "value": "", "description": "站点地址", "help": "WordPress站点URL，如 https://your-site.com", "category": "platform", "platform": "wordpress", "is_sensitive": False},
+    {"key": "wordpress_username", "value": "", "description": "用户名", "help": "WordPress管理员用户名", "category": "platform", "platform": "wordpress", "is_sensitive": False},
+    {"key": "wordpress_password", "value": "", "description": "应用密码", "help": "在WordPress后台 > 用户 > 应用密码中生成，不要使用登录密码", "category": "platform", "platform": "wordpress", "is_sensitive": True},
+    
+    # 系统配置
+    {"key": "hotspot_check_interval", "value": "300", "description": "热点检查间隔（秒）", "help": "系统自动检查热点的时间间隔，默认300秒（5分钟）", "category": "system", "platform": "", "is_sensitive": False},
+    {"key": "hotspot_min_score", "value": "0.6", "description": "热点最低分数", "help": "只有评分高于此值的热点才会被处理，范围0-1", "category": "system", "platform": "", "is_sensitive": False},
+    {"key": "publish_retry_count", "value": "3", "description": "发布重试次数", "help": "发布失败后的重试次数", "category": "system", "platform": "", "is_sensitive": False},
+    {"key": "publish_retry_delay", "value": "60", "description": "发布重试延迟（秒）", "help": "每次重试之间的等待时间", "category": "system", "platform": "", "is_sensitive": False},
 ]
+
+# 平台信息配置
+PLATFORM_INFO = {
+    "wechat": {
+        "name": "微信公众号",
+        "icon": "💬",
+        "description": "发布文章到微信公众号",
+        "docs_url": "https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Overview.html",
+        "required_configs": ["wechat_app_id", "wechat_app_secret"],
+        "setup_steps": [
+            "1. 注册微信公众号（服务号或订阅号）",
+            "2. 登录微信公众平台 https://mp.weixin.qq.com",
+            "3. 进入 设置与开发 > 基本配置",
+            "4. 获取 AppID 和 AppSecret",
+            "5. 配置 IP 白名单"
+        ]
+    },
+    "weibo": {
+        "name": "微博",
+        "icon": "📱",
+        "description": "发布内容到微博",
+        "docs_url": "https://open.weibo.com/wiki",
+        "required_configs": ["weibo_access_token"],
+        "setup_steps": [
+            "1. 注册微博开放平台账号",
+            "2. 创建应用 https://open.weibo.com",
+            "3. 获取 Access Token",
+            "4. 申请发布权限"
+        ]
+    },
+    "zhihu": {
+        "name": "知乎",
+        "icon": "❓",
+        "description": "发布文章到知乎",
+        "docs_url": "https://open.zhihu.com/docs",
+        "required_configs": ["zhihu_client_id", "zhihu_client_secret"],
+        "setup_steps": [
+            "1. 注册知乎开放平台账号",
+            "2. 创建应用 https://open.zhihu.com",
+            "3. 获取 Client ID 和 Client Secret",
+            "4. 配置回调地址"
+        ]
+    },
+    "xiaohongshu": {
+        "name": "小红书",
+        "icon": "📕",
+        "description": "发布笔记到小红书",
+        "docs_url": "",
+        "required_configs": ["xiaohongshu_cookie"],
+        "setup_steps": [
+            "1. 登录小红书网页版 https://www.xiaohongshu.com",
+            "2. 打开浏览器开发者工具（F12）",
+            "3. 切换到 Network 标签",
+            "4. 刷新页面，找到请求头中的 Cookie",
+            "5. 复制完整的 Cookie 值"
+        ]
+    },
+    "wordpress": {
+        "name": "WordPress",
+        "icon": "📝",
+        "description": "发布文章到WordPress站点",
+        "docs_url": "https://developer.wordpress.org/rest-api/",
+        "required_configs": ["wordpress_url", "wordpress_username", "wordpress_password"],
+        "setup_steps": [
+            "1. 确保WordPress站点已启用REST API",
+            "2. 登录WordPress后台",
+            "3. 进入 用户 > 应用密码",
+            "4. 创建新的应用密码",
+            "5. 使用用户名和应用密码配置"
+        ]
+    }
+}
 
 @router.get("/dashboard")
 async def get_dashboard_data(db: AsyncSession = Depends(get_db)):
@@ -92,11 +177,13 @@ async def get_system_logs(log_type: str = "system", limit: int = 100):
     }
 
 @router.get("/configs", response_model=List[Dict[str, Any]])
-async def get_all_configs(category: str = None, db: AsyncSession = Depends(get_db)):
+async def get_all_configs(category: str = None, platform: str = None, db: AsyncSession = Depends(get_db)):
     """获取所有配置"""
     query = db.query(SystemConfig)
     if category:
         query = query.filter(SystemConfig.category == category)
+    if platform:
+        query = query.filter(SystemConfig.platform == platform)
     configs = await query.all()
     
     return [
@@ -105,7 +192,9 @@ async def get_all_configs(category: str = None, db: AsyncSession = Depends(get_d
             "key": c.key,
             "value": "***" if c.is_sensitive and c.value else c.value,
             "description": c.description,
+            "help": c.help,
             "category": c.category,
+            "platform": c.platform,
             "is_sensitive": c.is_sensitive
         }
         for c in configs
@@ -123,7 +212,9 @@ async def get_config(key: str, db: AsyncSession = Depends(get_db)):
         "key": config.key,
         "value": config.value,
         "description": config.description,
+        "help": config.help,
         "category": config.category,
+        "platform": config.platform,
         "is_sensitive": config.is_sensitive
     }
 
@@ -153,3 +244,15 @@ async def init_default_configs(db: AsyncSession = Depends(get_db)):
     
     await db.commit()
     return {"message": f"已初始化 {len(DEFAULT_CONFIGS)} 个默认配置"}
+
+@router.get("/platforms/info")
+async def get_platforms_info():
+    """获取所有平台配置信息"""
+    return PLATFORM_INFO
+
+@router.get("/platforms/info/{platform_type}")
+async def get_platform_info(platform_type: str):
+    """获取指定平台配置信息"""
+    if platform_type not in PLATFORM_INFO:
+        raise HTTPException(status_code=404, detail="平台不存在")
+    return PLATFORM_INFO[platform_type]

@@ -45,6 +45,21 @@ async def index(request: Request):
     """首页"""
     return templates.TemplateResponse("index.html", {"request": request})
 
+@app.get("/hotspots", response_class=HTMLResponse)
+async def hotspots_page(request: Request):
+    """热点监控页面"""
+    return templates.TemplateResponse("hotspots.html", {"request": request})
+
+@app.get("/content", response_class=HTMLResponse)
+async def content_page(request: Request):
+    """内容生产页面"""
+    return templates.TemplateResponse("content.html", {"request": request})
+
+@app.get("/publish", response_class=HTMLResponse)
+async def publish_page(request: Request):
+    """发布管理页面"""
+    return templates.TemplateResponse("publish.html", {"request": request})
+
 @app.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request):
     """系统设置页面"""

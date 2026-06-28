@@ -22,6 +22,7 @@
     <main class="container">
         <div class="dashboard">
             <h1>系统概览</h1>
+            
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>热点源</h3>
@@ -34,6 +35,50 @@
                 <div class="stat-card">
                     <h3>已发布</h3>
                     <p id="published-count">0</p>
+                </div>
+            </div>
+            
+            <div class="quick-actions">
+                <h2>快速操作</h2>
+                <div class="actions-grid">
+                    <a href="/hotspots" class="action-card">
+                        <div class="action-icon">🔥</div>
+                        <h3>热点监控</h3>
+                        <p>查看和管理热点话题</p>
+                    </a>
+                    <a href="/content" class="action-card">
+                        <div class="action-icon">✍️</div>
+                        <h3>内容生产</h3>
+                        <p>生成和管理内容</p>
+                    </a>
+                    <a href="/publish" class="action-card">
+                        <div class="action-icon">🚀</div>
+                        <h3>发布管理</h3>
+                        <p>发布到各平台</p>
+                    </a>
+                    <a href="/settings" class="action-card">
+                        <div class="action-icon">⚙️</div>
+                        <h3>系统设置</h3>
+                        <p>配置系统参数</p>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="system-status-section">
+                <h2>系统状态</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="status-indicator system-status" data-service="event_bus"></span>
+                        <span>事件总线</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-indicator system-status" data-service="task_queue"></span>
+                        <span>任务队列</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-indicator system-status" data-service="database"></span>
+                        <span>数据库</span>
+                    </div>
                 </div>
             </div>
         </div>
