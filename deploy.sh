@@ -27,6 +27,10 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# 项目根目录
+PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
+VENV_DIR="$PROJECT_DIR/venv"
+
 # 检查Python版本
 check_python() {
     print_info "检查Python版本..."
@@ -39,33 +43,44 @@ check_python() {
     fi
 }
 
-# 检查并安装pip
-check_pip() {
-    print_info "检查pip..."
-    if ! command -v pip3 &> /dev/null; then
-        print_warn "pip3未安装，正在安装..."
-        apt-get update && apt-get install -y python3-pip
-    fi
-    print_info "pip已就绪"
-}
-
 # 安装系统依赖
 install_system_deps() {
     print_info "安装系统依赖..."
     apt-get update
     apt-get install -y \
         python3-dev \
+        python3-venv \
         gcc \
         redis-server \
         sqlite3
     print_info "系统依赖安装完成"
 }
 
+# 创建并激活虚拟环境
+setup_venv() {
+    print_info "设置虚拟环境..."
+    
+    if [ ! -d "$VENV_DIR" ]; then
+        print_info "创建虚拟环境: $VENV_DIR"
+        python3 -m venv "$VENV_DIR"
+    else
+        print_info "虚拟环境已存在"
+    fi
+    
+    # 激活虚拟环境
+    source "$VENV_DIR/bin/activate"
+    
+    # 升级pip
+    print_info "升级pip..."
+    pip install --upgrade pip
+    
+    print_info "虚拟环境已激活: $(python --version)"
+}
+
 # 安装Python依赖
 install_python_deps() {
     print_info "安装Python依赖..."
-    pip3 install --upgrade pip
-    pip3 install -r requirements.txt
+    pip install -r requirements.txt
     print_info "Python依赖安装完成"
 }
 
@@ -136,8 +151,10 @@ check_redis() {
 # 初始化数据库表
 init_database() {
     print_info "初始化数据库表..."
-    python3 -c "
+    python -c "
 import asyncio
+import sys
+sys.path.insert(0, '.')
 from src.database import init_db
 
 async def main():
@@ -165,18 +182,21 @@ start_app() {
     echo "=========================================="
     echo ""
     
-    uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    # 使用虚拟环境中的uvicorn
+    "$VENV_DIR/bin/uvicorn" src.main:app --host 0.0.0.0 --port 8000 --reload
 }
 
 # 主函数
 main() {
+    cd "$PROJECT_DIR"
+    
     echo ""
     print_info "开始部署OmniScribeAgent..."
     echo ""
     
     check_python
-    check_pip
     install_system_deps
+    setup_venv
     install_python_deps
     setup_env
     create_data_dirs
