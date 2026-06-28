@@ -23,3 +23,16 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        
+        # 检查并添加新字段
+        try:
+            # 获取现有列信息
+            result = await conn.execute("PRAGMA table_info(system_configs)")
+            columns = [row[1] for row in result.fetchall()]
+            
+            if 'help' not in columns:
+                await conn.execute("ALTER TABLE system_configs ADD COLUMN help TEXT")
+            if 'platform' not in columns:
+                await conn.execute("ALTER TABLE system_configs ADD COLUMN platform VARCHAR(100)")
+        except Exception as e:
+            print(f"更新表结构时出错: {e}")

@@ -126,7 +126,7 @@ function renderPlatformConfigs(configs) {
                 <div class="platform-setup-steps">
                     <h4>配置步骤：</h4>
                     <ol>
-                        ${platformInfo.steps.map(step => `<li>${step}</li>`).join('')}
+                        ${platformInfo.setup_steps.map(step => `<li>${step}</li>`).join('')}
                     </ol>
                 </div>
             ` : ''}
